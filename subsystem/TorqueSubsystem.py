@@ -1,5 +1,6 @@
-class Subsystem:
+from __future__ import annotations
 
+class Subsystem:
     def __init__(self, name: str) -> None:
         self.name = name
         self.subsystems: list[Subsystem] = []
