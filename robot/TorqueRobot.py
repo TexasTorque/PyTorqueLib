@@ -1,4 +1,4 @@
 import wpilib
 
-class TorqueRobotBase(wpilib.TimedRobotBase):
+class TorqueRobotBase(wpilib.TimedRobot):
     pass
