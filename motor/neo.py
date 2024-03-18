@@ -48,6 +48,10 @@ class Neo:
     def set_reference(self, goal: float, control: rev.CANSparkMax.ControlType) -> None:
         self.controller.setReference(goal, control)
 
+    def set_conversion_factor(self, posFactor: float, veloFactor: float) -> None:
+        self.encoder.setPositionConversionFactor(posFactor)
+        self.encoder.setVelocityConversionFactor(veloFactor)
+
     def set_position(self, pos: float) -> None:
         self.controller.setReference(pos, rev.CANSparkMax.ControlType.kPosition)
     
