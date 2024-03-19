@@ -65,7 +65,7 @@ class SwerveModule:
         return SwerveModuleState(self.drive.get_velocity(), self.get_rotation())
     
     def get_position(self) -> SwerveModulePosition:
-        if wpilib.RobotBase.isReal():
+        if not wpilib.RobotBase.isReal():
             return self.aggregate_position
         return SwerveModulePosition(self.drive.get_position(), self.get_rotation())
     
