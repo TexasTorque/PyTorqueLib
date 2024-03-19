@@ -38,7 +38,7 @@ class SwerveModule:
         self.aggregate_position = SwerveModulePosition(0, Rotation2d.fromDegrees(0))
         self.last_sampled_time = -1
     
-    def set_desired_state(self, state: SwerveModuleState, use_smart_drive: bool) -> None:
+    def set_desired_state(self, state: SwerveModuleState, use_smart_drive: bool = False) -> None:
         optimized = SwerveModuleState.optimize(state, self.get_rotation())
         
         if use_smart_drive:
