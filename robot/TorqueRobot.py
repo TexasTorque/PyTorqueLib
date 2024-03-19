@@ -12,3 +12,12 @@ class TorqueRobotBase(wpilib.TimedRobot):
     
     def teleopPeriodic(self) -> None:
         systems.update_subsystems()
+    
+    def disabledPeriodic(self) -> None:
+        pass
+
+    def robotPeriodic(self) -> None:
+        pass
+
+    def _simulationPeriodic(self) -> None:
+        pass
