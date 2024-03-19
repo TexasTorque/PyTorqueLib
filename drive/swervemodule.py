@@ -2,7 +2,7 @@ import math
 import wpilib
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
 from phoenix6.hardware.cancoder import CANcoder
-from motor.neo import Neo
+from lib.motor.neo import Neo
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
 
