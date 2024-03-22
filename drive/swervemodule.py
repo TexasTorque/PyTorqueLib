@@ -1,7 +1,8 @@
 import math
 import wpilib
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
-from phoenix6.hardware.cancoder import CANcoder
+from phoenix5.sensors import CANCoder
+# from rev import CANEncoder
 from lib.motor.neo import Neo
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
@@ -28,11 +29,11 @@ class SwerveModule:
         self.turn.set_conversion_factor(77.97432966, 1)
         self.turn.burn_flash()
 
-        self.encoder: CANcoder = CANcoder(encoderID)
+        self.encoder: CANCoder = CANCoder(encoderID)
 
         self.drivePID = PIDController(.1, 0, 0)
-        self.turnPID = PIDController(.5, 0, 0)
-        self.turnPID.enableContinuousInput(-180, 180)
+        self.turnPID = PIDController(.007, 0, 0)
+        self.turnPID.enableContinuousInput(0, 360)
         self.driveFF = SimpleMotorFeedforwardMeters(.1, .2)
 
         self.aggregate_position = SwerveModulePosition(0, Rotation2d.fromDegrees(0))
@@ -49,7 +50,7 @@ class SwerveModule:
         else:
             self.drive.set_percent(optimized.speed / 4.6)
         
-        turnPIDOutput = -self.turnPID.calculate(self.encoder.get_absolute_position().value_as_double)
+        turnPIDOutput = self.turnPID.calculate(self.encoder.getAbsolutePosition() * 180 / 3.141592653589, state.angle.degrees())
         self.turn.set_percent(turnPIDOutput)
 
         if not wpilib.RobotBase.isReal():
@@ -70,4 +71,4 @@ class SwerveModule:
         return SwerveModulePosition(self.drive.get_position(), self.get_rotation())
     
     def get_rotation(self) -> Rotation2d:
-        return Rotation2d.fromRotations(self.encoder.get_absolute_position().value_as_double)
+        return Rotation2d.fromRotations(self.encoder.getAbsolutePosition() * 180 / 3.141592653589)
