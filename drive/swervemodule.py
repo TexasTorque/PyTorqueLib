@@ -2,7 +2,6 @@ import math
 import wpilib
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
 from phoenix5.sensors import CANCoder
-# from rev import CANEncoder
 from lib.motor.neo import Neo
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
@@ -13,7 +12,7 @@ kModuleMaxAngularVelocity = math.pi
 kModuleMaxAngularAcceleration = math.tau
 
 class SwerveModule:
-    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int) -> None:
+    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float) -> None:
         self.name = name
         self.drive = Neo(driveID)
         self.drive.set_current_limit(35)
@@ -31,9 +30,11 @@ class SwerveModule:
 
         self.encoder: CANCoder = CANCoder(encoderID)
 
+        self.offset = offset
+
         self.drivePID = PIDController(.1, 0, 0)
-        self.turnPID = PIDController(.007, 0, 0)
-        self.turnPID.enableContinuousInput(0, 360)
+        self.turnPID = PIDController(.5, 0, 0)
+        self.turnPID.enableContinuousInput(-math.pi, math.pi)
         self.driveFF = SimpleMotorFeedforwardMeters(.1, .2)
 
         self.aggregate_position = SwerveModulePosition(0, Rotation2d.fromDegrees(0))
@@ -49,8 +50,8 @@ class SwerveModule:
             self.drive.set_percent(drivePIDOutput + driveFFOutput)
         else:
             self.drive.set_percent(optimized.speed / 4.6)
-        
-        turnPIDOutput = self.turnPID.calculate(self.encoder.getAbsolutePosition() * 180 / 3.141592653589, state.angle.degrees())
+
+        turnPIDOutput = self.turnPID.calculate(self.get_rotation().radians(), state.angle.radians())
         self.turn.set_percent(turnPIDOutput)
 
         if not wpilib.RobotBase.isReal():
@@ -71,4 +72,4 @@ class SwerveModule:
         return SwerveModulePosition(self.drive.get_position(), self.get_rotation())
     
     def get_rotation(self) -> Rotation2d:
-        return Rotation2d.fromRotations(self.encoder.getAbsolutePosition() * 180 / 3.141592653589)
+        return Rotation2d.fromDegrees((self.encoder.getPosition() - self.offset) * 180 / math.pi)
