@@ -6,11 +6,6 @@ from lib.motor.neo import Neo
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
 
-kWheelRadius = 0.0508
-kEncoderResolution = 4096
-kModuleMaxAngularVelocity = math.pi
-kModuleMaxAngularAcceleration = math.tau
-
 class SwerveModule:
     def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float) -> None:
         self.name = name
