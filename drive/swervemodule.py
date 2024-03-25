@@ -5,6 +5,7 @@ from phoenix5.sensors import CANCoder
 from lib.motor.neo import Neo
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
+from lib.util.torquemath import coterminal
 
 class SwerveModule:
     def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float) -> None:
@@ -67,4 +68,4 @@ class SwerveModule:
         return SwerveModulePosition(self.drive.get_position(), self.get_rotation())
     
     def get_rotation(self) -> Rotation2d:
-        return Rotation2d.fromDegrees((self.encoder.getPosition() - self.offset) * 180 / math.pi)
+        return coterminal(Rotation2d.fromDegrees((self.encoder.getPosition() - self.offset) * 180 / math.pi))
