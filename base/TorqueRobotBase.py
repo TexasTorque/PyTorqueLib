@@ -5,6 +5,7 @@ from lib.base.TorqueMode import TorqueMode
 class TorqueRobotBase(wpilib.TimedRobot):
 
     def __init__(self, input: TorqueSubsystem) -> None:
+        super().__init__()
         self.subsystems: list[TorqueSubsystem] = []
         self.input = input
     
@@ -16,7 +17,7 @@ class TorqueRobotBase(wpilib.TimedRobot):
             subsystem.initialize(TorqueMode.TELEOP)
     
     def teleopPeriodic(self) -> None:
-        self.input.update()
+        self.input.update(TorqueMode.TELEOP)
         for subsystem in self.subsystems:
             subsystem.update(TorqueMode.TELEOP)
 
@@ -33,6 +34,6 @@ class TorqueRobotBase(wpilib.TimedRobot):
             subsystem.initialize(TorqueMode.TEST)
     
     def testPeriodic(self) -> None:
-        self.input.update()
+        self.input.update(TorqueMode.TEST)
         for subsystem in self.subsystems:
             subsystem.update(TorqueMode.TEST)
