@@ -1,6 +1,6 @@
 import rev
 
-class Neo:
+class TorqueNEO:
     def __init__(self, id: int) -> None:
         self.motor = rev.CANSparkMax(id, rev.CANSparkLowLevel.MotorType.kBrushless)
         self.encoder = self.motor.getEncoder()

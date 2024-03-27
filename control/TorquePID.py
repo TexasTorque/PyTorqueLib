@@ -1,6 +1,6 @@
 from wpimath.controller import PIDController
 
-class TorquePID():
+class TorquePID:
     def __init__(self, P=1, I=0, D=0) -> None:
         self.P = P
         self.I = I
