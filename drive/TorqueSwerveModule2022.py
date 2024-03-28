@@ -10,7 +10,7 @@ from lib.util.TorqueMath import coterminal
 # Works on Fuse with custom swerve modules
 
 class TorqueSwerveModule2022:
-    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float) -> None:
+    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float = 0) -> None:
         self.name = name
         self.drive = TorqueNEO(driveID)
         self.drive.set_current_limit(35)
