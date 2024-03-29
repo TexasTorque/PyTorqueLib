@@ -1,6 +1,11 @@
-class Subsystem:
-    def initialize(self) -> None:
+from lib.base.TorqueMode import TorqueMode
+from abc import ABC, abstractmethod
+
+class TorqueSubsystem(ABC):
+    @abstractmethod
+    def initialize(self, mode: TorqueMode) -> None:
         print("Must override the update function!")
 
-    def update(self) -> None:
+    @abstractmethod
+    def update(self, mode: TorqueMode) -> None:
         print("Must override the update function!")

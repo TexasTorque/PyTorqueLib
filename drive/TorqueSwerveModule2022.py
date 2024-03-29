@@ -2,22 +2,24 @@ import math
 import wpilib
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
 from phoenix5.sensors import CANCoder
-from lib.motor.neo import Neo
+from lib.motor.TorqueNEO import TorqueNEO
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
-from lib.util.torquemath import coterminal
+from lib.util.TorqueMath import coterminal
 
-class SwerveModule:
-    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float) -> None:
+# Works on Fuse with custom swerve modules
+
+class TorqueSwerveModule2022:
+    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float = 0) -> None:
         self.name = name
-        self.drive = Neo(driveID)
+        self.drive = TorqueNEO(driveID)
         self.drive.set_current_limit(35)
         self.drive.set_voltage_compensation(12.6)
         self.drive.set_break_mode(True)
         self.drive.set_conversion_factor(.0485823156, 8.097052603e-4)
         self.drive.burn_flash()
 
-        self.turn = Neo(turnID)
+        self.turn = TorqueNEO(turnID)
         self.turn.set_current_limit(25)
         self.turn.set_voltage_compensation(12.6)
         self.turn.set_break_mode(True)
