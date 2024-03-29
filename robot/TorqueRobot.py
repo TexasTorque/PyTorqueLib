@@ -1,23 +1,18 @@
 import wpilib
-import systems
+from lib.subsystem.TorqueSubsystem import Subsystem
 
 class TorqueRobotBase(wpilib.TimedRobot):
 
     def __init__(self) -> None:
-        super().__init__()
-        systems.add_subsystems()
+        self.subsystems: list[Subsystem] = []
+    
+    def add_subsystem(self, subsystem: Subsystem) -> None:
+        self.subsystems.append(subsystem)
     
     def robotInit(self) -> None:
-        systems.init_subsystems()
+        for subsystem in self.subsystems:
+            subsystem.initialize()
     
-    def teleopPeriodic(self) -> None:
-        systems.update_subsystems()
-    
-    def disabledPeriodic(self) -> None:
-        pass
-
     def robotPeriodic(self) -> None:
-        pass
-
-    def _simulationPeriodic(self) -> None:
-        pass
+        for subsystem in self.subsystems:
+            subsystem.update()

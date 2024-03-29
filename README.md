@@ -13,3 +13,5 @@ But if you so insist, you can add it to an existing project using:
 ## Authors
 
 - [Davey Adams](https://www.github.com/humandavey/) (2022-2025)
+
+- [Tima Gezalov](https://www.github.com/timagez) (2023-2027)
