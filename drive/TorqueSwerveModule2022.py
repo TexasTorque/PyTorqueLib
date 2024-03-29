@@ -9,24 +9,30 @@ from lib.util.TorqueMath import coterminal
 
 # Works on Fuse with custom swerve modules
 
+class SwervePorts:
+    def __init__(self, driveID, turnID, encoderID) -> None:
+        self.driveID = driveID
+        self.turnID = turnID
+        self.encoderID = encoderID
+
 class TorqueSwerveModule2022:
-    def __init__(self, name: str, driveID: int, turnID: int, encoderID: int, offset: float = 0) -> None:
+    def __init__(self, name: str, ports: SwervePorts, offset: float = 0) -> None:
         self.name = name
-        self.drive = TorqueNEO(driveID)
+        self.drive = TorqueNEO(ports.driveID)
         self.drive.set_current_limit(35)
         self.drive.set_voltage_compensation(12.6)
         self.drive.set_break_mode(True)
         self.drive.set_conversion_factor(.0485823156, 8.097052603e-4)
         self.drive.burn_flash()
 
-        self.turn = TorqueNEO(turnID)
+        self.turn = TorqueNEO(ports.turnID)
         self.turn.set_current_limit(25)
         self.turn.set_voltage_compensation(12.6)
         self.turn.set_break_mode(True)
         self.turn.set_conversion_factor(77.97432966, 1)
         self.turn.burn_flash()
 
-        self.encoder: CANCoder = CANCoder(encoderID)
+        self.encoder: CANCoder = CANCoder(ports.encoderID)
 
         self.offset = offset
 
