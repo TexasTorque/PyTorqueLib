@@ -47,7 +47,7 @@ class SwerveModule:
         else:
             self.drive.set_percent(optimized.speed / 4.6)
 
-        turnPIDOutput = self.turnPID.calculate(self.get_rotation().radians(), state.angle.radians())
+        turnPIDOutput = self.turnPID.calculate(self.get_rotation().radians(), optimized.angle.radians())
         self.turn.set_percent(turnPIDOutput)
 
         if not wpilib.RobotBase.isReal():
