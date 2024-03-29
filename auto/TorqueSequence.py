@@ -1,22 +1,23 @@
 from lib.auto.TorqueCommand import TorqueCommand
+from lib.auto.TorqueBlock import TorqueBlock
 
 class TorqueSequence:
     def __init__(self) -> None:
-        self.commands: list[TorqueCommand] = []
+        self.blocks: list[TorqueBlock] = []
         self.ended = False
-        self.index = 0
+        self.block_index = 0
 
     def exit(self) -> None:
         self.ended = True
     
     def run(self) -> bool:
-        if self.index < len(self.commands):
-            command_ended = True
-            for command in self.commands:
+        if self.block_index < len(self.blocks):
+            block_ended = True
+            for command in self.blocks[self.block_index].get_commands():
                 if not command.run():
-                    command_ended = False
-            if command_ended:
-                self.index += 1
+                    block_ended = False
+            if block_ended:
+                self.block_index += 1
         elif not self.ended:
             self.ended = True
     
@@ -26,14 +27,14 @@ class TorqueSequence:
     def reset(self) -> None:
         self.ended = False
         self.block_index = 0
-        for block in self.commands:
-            for command in block:
+        for block in self.blocks:
+            for command in block.get_commands():
                 command.reset()
     
     def resetBlock(self) -> None:
         self.ended = False
-        for command in self.commands[self.block_index]:
+        for command in self.blocks[self.block_index].get_commands():
             command.reset()
 
     def add_command(self, command: TorqueCommand) -> None:
-        self.commands.append(command)
+        self.blocks.append(command)
