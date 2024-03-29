@@ -4,6 +4,7 @@ from lib.subsystem.TorqueSubsystem import Subsystem
 class TorqueRobotBase(wpilib.TimedRobot):
 
     def __init__(self) -> None:
+        super().__init__()
         self.subsystems: list[Subsystem] = []
     
     def add_subsystem(self, subsystem: Subsystem) -> None:
