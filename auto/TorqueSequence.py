@@ -20,6 +20,7 @@ class TorqueSequence:
                 self.block_index += 1
         elif not self.ended:
             self.ended = True
+        return self.ended
     
     def has_ended(self) -> bool:
         return self.ended
@@ -37,4 +38,4 @@ class TorqueSequence:
             command.reset()
 
     def add_command(self, command: TorqueCommand) -> None:
-        self.blocks.append(command)
+        self.blocks.append(TorqueBlock(command))
