@@ -32,10 +32,10 @@ class TorqueSequence:
             for command in block.get_commands():
                 command.reset()
     
-    def resetBlock(self) -> None:
+    def reset_block(self) -> None:
         self.ended = False
         for command in self.blocks[self.block_index].get_commands():
             command.reset()
 
-    def add_command(self, command: TorqueCommand) -> None:
+    def add_block(self, command: TorqueCommand) -> None:
         self.blocks.append(TorqueBlock(command))
