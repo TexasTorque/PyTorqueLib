@@ -8,6 +8,8 @@ class TorqueAutoManager(ABC):
         self.sequences = {}
         self.current_sequence: TorqueSequence | None = None
 
+        self.load_sequences()
+
         self.display_choices()
     
     def display_choices(self) -> None:
