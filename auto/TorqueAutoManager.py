@@ -22,6 +22,7 @@ class TorqueAutoManager(ABC):
             self.chooser.setDefaultOption(name, name)
         else:
             self.chooser.addOption(name, name)
+        wpilib.SmartDashboard.putData("Auto List", self.chooser)
     
     def choose_current_sequence(self) -> None:
         self.current_sequence = self.sequences.get(self.chooser.getSelected())
