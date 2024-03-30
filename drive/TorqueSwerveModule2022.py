@@ -17,8 +17,8 @@ class SwervePorts:
 
 class SwerveConfig:
     def __init__(self, free_wheel_speed: float = 4.6, drive_gear_ratio: float = 6.75, turn_gear_ratio: float = 13.71,
-                 drive_p: float = .1, drive_i: float = 0, drive_d: float = 0, drive_ff: float = .2, drive_max_current: float = 35,
-                 turn_p: float = .5, turn_i: float = 0, turn_d: float = 0, turn_max_current: float = 25,
+                 drive_p: float = .1, drive_i: float = 0, drive_d: float = 0, drive_ff: float = .2, drive_max_current: int = 35,
+                 turn_p: float = .5, turn_i: float = 0, turn_d: float = 0, turn_max_current: int = 25,
                  voltage_compensation: float = 12.6, max_acceleration: float = 3, max_angular_velocity: float = math.pi,
                  max_angular_acceleration: float = math.pi, wheel_diameter: float = 4 * .0254
                  ) -> None:

@@ -61,7 +61,7 @@ class TorqueNEO:
     def set_velocity(self, velocity: float) -> None:
         self.controller.setReference(velocity, rev.CANSparkMax.ControlType.kVelocity)
     
-    def get_velocity(self) -> None:
+    def get_velocity(self) -> float:
         return self.encoder.getVelocity()
     
     def set_smart_velocity(self, velocity: float) -> None:
