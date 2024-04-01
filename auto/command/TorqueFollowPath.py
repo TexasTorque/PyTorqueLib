@@ -41,3 +41,4 @@ class TorqueFollowPath(TorqueCommand):
         
     def end(self) -> None:
         self.timer.stop()
+        systems.drivebase.set_speeds(0, 0, 0)
