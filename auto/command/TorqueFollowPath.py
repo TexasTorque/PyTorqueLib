@@ -6,45 +6,38 @@ from wpimath.geometry import Pose2d
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpilib import DriverStation
-from wpilib import Timer
-from subsystems.Drivebase import Drivebase, get_drivebase
+import systems, wpilib
 from pathplannerlib.telemetry import PPLibTelemetry
 
 class TorqueFollowPath(TorqueCommand):
     def __init__(self) -> None:
         super().__init__()
         
-        self.drivebase = get_drivebase()
-        
-        self.timer = Timer()
-        
-        self.prevTranslation = Translation2d()
-        
-        PathPlannerPath.fromPathFile('path name') # set path name here
+        self.timer = wpilib.Timer()
+    
+    def init(self) -> None:
+        path = PathPlannerPath.fromPathFile('path name') # path supplier
 
-        path = PathPlannerPath() #fix later
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+            path = path.flipPath()
         
-        trajectory = PathPlannerTrajectory
-        
-        self.trajectory = path.getTrajectory(ChassisSpeeds(), Rotation2d.fromDegrees(self.drivebase.get_gyro_measurement()))
-        endPosition = self.trajectory.getEndState().getDifferentialPose()
+        self.trajectory = path.getTrajectory(ChassisSpeeds(), Rotation2d.fromDegrees(systems.drivebase.get_gyro_measurement()))
         
         PPLibTelemetry.setCurrentPath(path)
         
         startingPose = self.trajectory.getInitialDifferentialPose()
-        self.drivebase.setPose(startingPose)
+        systems.drivebase.set_pose(startingPose)
         self.timer.restart()
         
-        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-            path = path.flipPath()
-        
     def continuous(self) -> None:
-        
         elapsed = self.timer.get()
         desired = self.trajectory.sample(elapsed)
         
-        PPLibTelemetry.setCurrentPose(self.drivebase.getPose())
+        PPLibTelemetry.setCurrentPose(systems.drivebase.get_pose())
         PPLibTelemetry.setTargetPose(desired.getDifferentialPose())
+    
+    def end_condition(self) -> bool:
+        return self.timer.hasElapsed(self.trajectory.getTotalTimeSeconds())
         
     def end(self) -> None:
         self.timer.stop()
