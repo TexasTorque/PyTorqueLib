@@ -1,6 +1,7 @@
 import wpilib
 from abc import ABC, abstractmethod
 from lib.auto.TorqueSequence import TorqueSequence
+from lib.auto.TorquePathLoader import TorquePathLoader
 
 class TorqueAutoManager(ABC):
     def __init__(self) -> None:
@@ -9,6 +10,8 @@ class TorqueAutoManager(ABC):
         self.current_sequence: TorqueSequence | None = None
 
         self.load_sequences()
+
+        self.path_loader = TorquePathLoader()
 
         self.display_choices()
     
