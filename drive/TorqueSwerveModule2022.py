@@ -5,7 +5,7 @@ from phoenix5.sensors import CANCoder
 from lib.motor.TorqueNEO import TorqueNEO
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
-from lib.util.torquemath import coterminal
+from lib.util.TorqueMath import coterminal
 
 # Works on Fuse with custom swerve modules
 
