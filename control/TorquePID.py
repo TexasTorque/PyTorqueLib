@@ -15,5 +15,5 @@ class TorquePID:
     def set_d_value(self, D) -> None:
         self.D = D
         
-    def calculate(self) -> None:
+    def calculate(self) -> PIDController:
         return PIDController(self.P, self.I, self.D)
