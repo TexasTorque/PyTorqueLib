@@ -25,7 +25,7 @@ class TorqueFollowPath(TorqueCommand):
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
             self.path = self.path.flipPath()
         
-        self.trajectory = self.path.getTrajectory(ChassisSpeeds(), Rotation2d.fromDegrees(systems.drivebase.get_gyro_measurement()))
+        self.trajectory = self.path.getTrajectory(ChassisSpeeds(), systems.drivebase.gyro.get_heading_ccw())
         
         PPLibTelemetry.setCurrentPath(self.path)
         
