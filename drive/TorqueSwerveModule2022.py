@@ -6,14 +6,9 @@ from lib.motor.TorqueNEO import TorqueNEO
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
 from lib.util.TorqueMath import coterminal
+from ports import SwervePorts
 
 # Works on Fuse with custom swerve modules
-
-class SwervePorts:
-    def __init__(self, driveID, turnID, encoderID) -> None:
-        self.driveID = driveID
-        self.turnID = turnID
-        self.encoderID = encoderID
 
 class SwerveConfig:
     def __init__(self, free_wheel_speed: float = 4.6, drive_gear_ratio: float = 6.75, turn_gear_ratio: float = 13.71,

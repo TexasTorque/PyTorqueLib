@@ -12,11 +12,7 @@ from phoenix6.signals import InvertedValue
 from phoenix6.signals import NeutralModeValue
 from phoenix6.controls import DutyCycleOut
 
-class SwervePorts:
-    def __init__(self, driveID, turnID, encoderID) -> None:
-        self.driveID = driveID
-        self.turnID = turnID
-        self.encoderID = encoderID
+from ports import SwervePorts
 
 class TorqueSwerveModuleKraken:
     def __init__(self, name: str, ports: SwervePorts, offset: float = 0) -> None:
@@ -40,7 +36,7 @@ class TorqueSwerveModuleKraken:
         self.drive_config.closed_loop_ramps.voltage_closed_loop_ramp_period = 0
 
         self.drive = TalonFX(ports.driveID)
-        self.drive.configurator.apply(self.drive_config)
+        self.drive.configurator.apply(self.drive_config) # type: ignore FIX LATER
         self.drive.configurator.set_position(0)
 
         self.drive_duty_cycle = DutyCycleOut(0)
