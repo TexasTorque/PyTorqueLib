@@ -1,7 +1,7 @@
 import math
 import wpilib
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
-from phoenix5.sensors import CANCoder
+from phoenix6.hardware import CANcoder
 from lib.motor.TorqueNEO import TorqueNEO
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
@@ -48,7 +48,7 @@ class TorqueSwerveModuleKraken:
         self.turn.set_conversion_factor(77.97432966, 1)
         self.turn.burn_flash()
 
-        self.encoder: CANCoder = CANCoder(ports.encoderID)
+        self.encoder: CANcoder = CANcoder(ports.encoderID)
 
         self.offset = offset
 
@@ -94,4 +94,4 @@ class TorqueSwerveModuleKraken:
         return SwerveModulePosition(self.drive.get_position().value_as_double, self.get_rotation())
     
     def get_rotation(self) -> Rotation2d:
-        return coterminal(Rotation2d.fromDegrees((self.encoder.getPosition() - self.offset) * 180 / math.pi))
+        return coterminal(Rotation2d.fromDegrees((self.encoder.get_position().value_as_double - self.offset) * 180 / math.pi))
