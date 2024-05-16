@@ -25,6 +25,8 @@ class TorqueRobotBase(wpilib.TimedRobot):
         self.input.update(TorqueMode.TELEOP)
         for subsystem in self.subsystems:
             subsystem.update(TorqueMode.TELEOP)
+        for subsystem in self.subsystems:
+            subsystem.clean(TorqueMode.TELEOP)
 
     def autonomousInit(self) -> None:
         self.automanager.choose_current_sequence()
@@ -35,6 +37,8 @@ class TorqueRobotBase(wpilib.TimedRobot):
         self.automanager.run_current_sequence()
         for subsystems in self.subsystems:
             subsystems.update(TorqueMode.AUTO)
+        for subsystem in self.subsystems:
+            subsystem.clean(TorqueMode.AUTO)
     
     def testInit(self) -> None:
         for subsystem in self.subsystems:
@@ -44,3 +48,5 @@ class TorqueRobotBase(wpilib.TimedRobot):
         self.input.update(TorqueMode.TEST)
         for subsystem in self.subsystems:
             subsystem.update(TorqueMode.TEST)
+        for subsystem in self.subsystems:
+            subsystem.clean(TorqueMode.TEST)
