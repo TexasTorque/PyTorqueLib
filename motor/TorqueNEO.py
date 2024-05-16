@@ -38,6 +38,9 @@ class TorqueNEO:
     
     def set_current_limit(self, amps: int) -> None:
         self.motor.setSmartCurrentLimit(amps)
+
+    def set_inverted(self, invert: bool) -> None:
+        self.motor.setInverted(invert)
     
     def configure_controller(self, p: float, i: float, d: float, ff: float = 0) -> None:
         self.controller.setP(p)
