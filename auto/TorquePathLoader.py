@@ -2,7 +2,7 @@ from pathplannerlib.auto import PathPlannerPath
 
 class TorquePathLoader:
     def __init__(self) -> None:
-        self.trajectories = {}
+        self.trajectories: dict[str, PathPlannerPath] = {}
 
     def preload_path(self, path_name: str) -> None:
         if self.trajectories.get(path_name):

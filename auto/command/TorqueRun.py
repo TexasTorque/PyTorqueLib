@@ -1,7 +1,7 @@
 from lib.auto.TorqueCommand import TorqueCommand
 
 class TorqueRun(TorqueCommand):
-    def __init__(self, function) -> None:
+    def __init__(self, function) -> None: # type: ignore
         super().__init__()
         self.function = function
 

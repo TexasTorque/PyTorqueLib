@@ -6,7 +6,7 @@ from lib.auto.TorquePathLoader import TorquePathLoader
 class TorqueAutoManager(ABC):
     def __init__(self) -> None:
         self.chooser = wpilib.SendableChooser()
-        self.sequences = {}
+        self.sequences: dict[str, TorqueSequence] = {}
         self.current_sequence: TorqueSequence | None = None
 
         self.load_sequences()
