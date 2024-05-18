@@ -3,11 +3,11 @@ from wpimath import angleModulus
 import numpy as np
 
 class TorquePolynomialRegression:
-    def __init__(self, x, y) -> None:
+    def __init__(self, x: list[float | int], y: list[float | int]) -> None:
         self.model = np.polyfit(x, y, 2)
         self.inference = np.poly1d(self.model)
 
-    def predict(self, x):
+    def predict(self, x: float | int):
         return self.inference(x)
 
 
