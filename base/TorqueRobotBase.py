@@ -4,11 +4,11 @@ from lib.base.TorqueMode import TorqueMode
 from auto.automanager import AutoManager
 
 class TorqueRobotBase(wpilib.TimedRobot):
-
-    def __init__(self, input: TorqueSubsystem, automanager: AutoManager) -> None:
+    def __init__(self, input: TorqueSubsystem, lights: TorqueSubsystem, automanager: AutoManager) -> None:
         super().__init__()
         self.subsystems: list[TorqueSubsystem] = []
         self.input = input
+        self.lights = lights
         self.automanager = automanager
     
     def add_subsystem(self, subsystem: TorqueSubsystem) -> None:
@@ -16,6 +16,9 @@ class TorqueRobotBase(wpilib.TimedRobot):
 
     def robotInit(self) -> None:
         self.automanager.load_paths()
+
+    def robotPeriodic(self) -> None:
+        self.lights.update(TorqueMode.ROBOT)
     
     def teleopInit(self) -> None:
         for subsystem in self.subsystems:

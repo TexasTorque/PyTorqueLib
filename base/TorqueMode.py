@@ -6,4 +6,5 @@ class TorqueMode(Enum):
     AUTO = 2
     TEST = 3
     SIM = 4
-    ERROR = 5
+    ROBOT = 5
+    ERROR = 6
