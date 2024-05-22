@@ -4,51 +4,72 @@ from lib.base.TorqueMode import TorqueMode
 from auto.automanager import AutoManager
 
 class TorqueRobotBase(wpilib.TimedRobot):
-    def __init__(self, input: TorqueSubsystem, lights: TorqueSubsystem, automanager: AutoManager) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.subsystems: list[TorqueSubsystem] = []
+        self.input: TorqueSubsystem | None = None
+        self.lights: TorqueSubsystem | None = None
+        self.auto_manager: AutoManager | None = None
+    
+    def set_input(self, input: TorqueSubsystem) -> None:
         self.input = input
+    
+    def set_lights(self, lights: TorqueSubsystem) -> None:
         self.lights = lights
-        self.automanager = automanager
+    
+    def set_auto_manager(self, auto_manager: AutoManager) -> None:
+        self.auto_manager = auto_manager
     
     def add_subsystem(self, subsystem: TorqueSubsystem) -> None:
         self.subsystems.append(subsystem)
 
     def robotInit(self) -> None:
-        self.automanager.load_paths()
+        if self.auto_manager != None:
+            self.auto_manager.load_paths()
+        if self.lights != None:
+            self.lights.initialize(TorqueMode.ROBOT)
 
     def robotPeriodic(self) -> None:
-        self.lights.update(TorqueMode.ROBOT)
+        if self.lights != None:
+            self.lights.update(TorqueMode.ROBOT)
     
     def teleopInit(self) -> None:
+        if self.input != None:
+            self.input.initialize(TorqueMode.TELEOP)
         for subsystem in self.subsystems:
             subsystem.initialize(TorqueMode.TELEOP)
     
     def teleopPeriodic(self) -> None:
-        self.input.update(TorqueMode.TELEOP)
+        if self.input != None:
+            self.input.update(TorqueMode.TELEOP)
         for subsystem in self.subsystems:
             subsystem.update(TorqueMode.TELEOP)
         for subsystem in self.subsystems:
             subsystem.clean(TorqueMode.TELEOP)
 
     def autonomousInit(self) -> None:
-        self.automanager.choose_current_sequence()
+        if self.auto_manager != None:
+            self.auto_manager.choose_current_sequence()
         for subsystem in self.subsystems:
             subsystem.initialize(TorqueMode.AUTO)
     
     def autonomousPeriodic(self) -> None:
-        self.automanager.run_current_sequence()
+        if self.auto_manager != None:
+            self.auto_manager.run_current_sequence()
         for subsystems in self.subsystems:
             subsystems.update(TorqueMode.AUTO)
         for subsystem in self.subsystems:
             subsystem.clean(TorqueMode.AUTO)
     
     def testInit(self) -> None:
+        if self.input != None:
+            self.input.initialize(TorqueMode.TEST)
         for subsystem in self.subsystems:
             subsystem.initialize(TorqueMode.TEST)
     
     def testPeriodic(self) -> None:
-        self.input.update(TorqueMode.TEST)
+        if self.input != None:
+            self.input.update(TorqueMode.TEST)
         for subsystem in self.subsystems:
             subsystem.update(TorqueMode.TEST)
         for subsystem in self.subsystems:
