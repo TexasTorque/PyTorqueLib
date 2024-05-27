@@ -17,3 +17,5 @@ def scaled_linear_deadband(value: float, scale: float) -> float:
 def coterminal(rotation: Rotation2d) -> Rotation2d:
     return Rotation2d(angleModulus(rotation.radians()))
 
+def constrain(n: float, a: float) -> float:
+     return max(min(n, a), -a)
