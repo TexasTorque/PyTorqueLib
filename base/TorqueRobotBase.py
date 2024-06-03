@@ -9,6 +9,7 @@ class TorqueRobotBase(wpilib.TimedRobot):
         self.subsystems: list[TorqueSubsystem] = []
         self.input: TorqueSubsystem | None = None
         self.lights: TorqueSubsystem | None = None
+        self.perception: TorqueSubsystem | None = None
         self.auto_manager: AutoManager | None = None
     
     def set_input(self, input: TorqueSubsystem) -> None:
@@ -16,6 +17,9 @@ class TorqueRobotBase(wpilib.TimedRobot):
     
     def set_lights(self, lights: TorqueSubsystem) -> None:
         self.lights = lights
+
+    def set_perception(self, perception: TorqueSubsystem) -> None:
+        self.perception = perception
     
     def set_auto_manager(self, auto_manager: AutoManager) -> None:
         self.auto_manager = auto_manager
@@ -28,10 +32,14 @@ class TorqueRobotBase(wpilib.TimedRobot):
             self.auto_manager.load_paths()
         if self.lights != None:
             self.lights.initialize(TorqueMode.ROBOT)
+        if self.perception != None:
+            self.perception.initialize(TorqueMode.ROBOT)
 
     def robotPeriodic(self) -> None:
         if self.lights != None:
             self.lights.update(TorqueMode.ROBOT)
+        if self.perception != None:
+            self.perception.update(TorqueMode.ROBOT)
     
     def teleopInit(self) -> None:
         if self.input != None:
