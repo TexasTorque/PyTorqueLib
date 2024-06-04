@@ -53,7 +53,7 @@ class TorqueSwerveModuleKraken:
         self.offset = offset
 
         self.drivePID = PIDController(.1, 0, 0)
-        self.turnPID = PIDController(.5, 0, 0)
+        self.turnPID = PIDController(.375, 0, 0)
         self.turnPID.enableContinuousInput(-math.pi, math.pi)
         self.driveFF = SimpleMotorFeedforwardMeters(.1, .2)
 
@@ -71,7 +71,7 @@ class TorqueSwerveModuleKraken:
         else:
             self.drive_duty_cycle.output = optimized.speed / 4.6
 
-        turnPIDOutput = self.turnPID.calculate(self.get_rotation().radians(), state.angle.radians())
+        turnPIDOutput = -self.turnPID.calculate(self.get_rotation().radians(), optimized.angle.radians())
         self.turn.set_percent(turnPIDOutput)
 
         self.drive.set_control(self.drive_duty_cycle)
@@ -94,4 +94,4 @@ class TorqueSwerveModuleKraken:
         return SwerveModulePosition(self.drive.get_position().value_as_double, self.get_rotation())
     
     def get_rotation(self) -> Rotation2d:
-        return coterminal(Rotation2d.fromDegrees((self.encoder.get_position().value_as_double - self.offset) * 180 / math.pi))
+        return Rotation2d(self.encoder.get_absolute_position().value_as_double * 2 * math.pi)
