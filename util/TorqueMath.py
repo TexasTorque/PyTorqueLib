@@ -18,4 +18,7 @@ def coterminal(rotation: Rotation2d) -> Rotation2d:
     return Rotation2d(angleModulus(rotation.radians()))
 
 def constrain(n: float, a: float) -> float:
-     return max(min(n, a), -a)
+    return max(min(n, a), -a)
+
+def tolerenced(num: float, target: float, by: float) -> bool:
+    return num > target - by and num < target + by
