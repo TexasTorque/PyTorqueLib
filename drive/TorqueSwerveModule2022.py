@@ -1,7 +1,8 @@
+from __future__ import annotations
 import math
 import wpilib
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
-from phoenix5.sensors import CANCoder
+from phoenix6.hardware import CANcoder
 from lib.motor.TorqueNEO import TorqueNEO
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
@@ -58,7 +59,7 @@ class TorqueSwerveModule2022:
         self.turn.set_conversion_factor(config.turn_gear_ratio * 2 * math.pi, 1)
         self.turn.burn_flash()
 
-        self.encoder: CANCoder = CANCoder(ports.encoderID)
+        self.encoder = CANcoder(ports.encoderID)
 
         self.offset = offset
 
@@ -66,6 +67,10 @@ class TorqueSwerveModule2022:
         self.turnPID = PIDController(config.turn_p, config.turn_i, config.turn_d)
         self.turnPID.enableContinuousInput(-math.pi, math.pi)
         self.driveFF = SimpleMotorFeedforwardMeters(config.drive_p, config.drive_ff)
+
+        self.drive_reversed = False
+        self.turn_reversed = False
+        self.disabled = False
 
         self.aggregate_position = SwerveModulePosition(0, Rotation2d.fromDegrees(0))
         self.last_sampled_time = -1
@@ -79,10 +84,26 @@ class TorqueSwerveModule2022:
 
             self.drive.set_percent(drivePIDOutput + driveFFOutput)
         else:
-            self.drive.set_percent(optimized.speed / self.config.max_velocity)
 
-        turnPIDOutput = self.turnPID.calculate(self.get_rotation().radians(), optimized.angle.radians())
-        self.turn.set_percent(turnPIDOutput)
+            if self.drive_reversed:
+                self.drive.set_percent(-optimized.speed / self.config.max_velocity)
+            else:
+                self.drive.set_percent(optimized.speed / self.config.max_velocity)
+
+        turnPIDOutput = -self.turnPID.calculate(self.get_rotation().radians(), optimized.angle.radians())
+
+        if self.turn_reversed:
+            turnPIDOutput = -turnPIDOutput
+
+        if not self.disabled:
+            self.turn.set_percent(turnPIDOutput)
+
+        wpilib.SmartDashboard.putNumber(self.name + " turn translated", self.get_rotation().degrees())
+        wpilib.SmartDashboard.putNumber(self.name + " turn encoder", self.encoder.get_position().value_as_double)
+        wpilib.SmartDashboard.putNumber(self.name + " drive velo", self.drive.get_velocity())
+        wpilib.SmartDashboard.putNumber(self.name + " req drive velo", optimized.speed)
+        wpilib.SmartDashboard.putNumber(self.name + " req turn velo", optimized.angle.degrees())
+        wpilib.SmartDashboard.putNumber(self.name + " turn pid", turnPIDOutput)
 
         if not wpilib.RobotBase.isReal():
             time = wpilib.Timer.getFPGATimestamp()
@@ -102,4 +123,16 @@ class TorqueSwerveModule2022:
         return SwerveModulePosition(self.drive.get_position(), self.get_rotation())
     
     def get_rotation(self) -> Rotation2d:
-        return coterminal(Rotation2d(self.encoder.getPosition() - self.offset))
+        return coterminal(Rotation2d((self.encoder.get_absolute_position().value_as_double) * 2 * math.pi))
+    
+    def disable(self, disabled: bool = True) -> TorqueSwerveModule2022:
+        self.disabled = disabled
+        return self
+    
+    def reverse_drive(self, reverse: bool = True) -> TorqueSwerveModule2022:
+        self.drive_reversed = reverse
+        return self
+    
+    def reverse_turn(self, reverse: bool = True) -> TorqueSwerveModule2022:
+        self.turn_reversed = reverse
+        return self
