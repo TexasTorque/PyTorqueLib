@@ -26,6 +26,9 @@ class TorqueRobotBase(wpilib.TimedRobot):
     
     def add_subsystem(self, subsystem: TorqueSubsystem) -> None:
         self.subsystems.append(subsystem)
+    
+    def disabledPeriodic(self) -> None:
+        wpilib.SmartDashboard.updateValues()
 
     def robotInit(self) -> None:
         if self.auto_manager != None:
