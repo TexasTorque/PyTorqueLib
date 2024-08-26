@@ -98,13 +98,6 @@ class TorqueSwerveModule2022:
         if not self.disabled:
             self.turn.set_percent(turnPIDOutput)
 
-        wpilib.SmartDashboard.putNumber(self.name + " turn translated", self.get_rotation().degrees())
-        wpilib.SmartDashboard.putNumber(self.name + " turn encoder", self.encoder.get_position().value_as_double)
-        wpilib.SmartDashboard.putNumber(self.name + " drive velo", self.drive.get_velocity())
-        wpilib.SmartDashboard.putNumber(self.name + " req drive velo", optimized.speed)
-        wpilib.SmartDashboard.putNumber(self.name + " req turn velo", optimized.angle.degrees())
-        wpilib.SmartDashboard.putNumber(self.name + " turn pid", turnPIDOutput)
-
         if not wpilib.RobotBase.isReal():
             time = wpilib.Timer.getFPGATimestamp()
             if self.last_sampled_time == -1:
