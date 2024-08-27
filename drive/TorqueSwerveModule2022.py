@@ -69,6 +69,7 @@ class TorqueSwerveModule2022:
         self.driveFF = SimpleMotorFeedforwardMeters(config.drive_p, config.drive_ff)
 
         self.drive_reversed = False
+        self.drive_reveresed_auto = False
         self.turn_reversed = False
         self.disabled = False
 
@@ -82,9 +83,11 @@ class TorqueSwerveModule2022:
             drivePIDOutput = self.drivePID.calculate(self.drive.get_velocity(), optimized.speed)
             driveFFOutput = self.driveFF.calculate(optimized.speed)
 
-            self.drive.set_percent(drivePIDOutput + driveFFOutput)
+            if self.drive_reveresed_auto:
+                self.drive.set_percent(-(drivePIDOutput + driveFFOutput))
+            else:
+                self.drive.set_percent(drivePIDOutput + driveFFOutput)
         else:
-
             if self.drive_reversed:
                 self.drive.set_percent(-optimized.speed / self.config.max_velocity)
             else:
@@ -124,6 +127,10 @@ class TorqueSwerveModule2022:
     
     def reverse_drive(self, reverse: bool = True) -> TorqueSwerveModule2022:
         self.drive_reversed = reverse
+        return self
+    
+    def reverse_drive_auto(self, reverse: bool = True) -> TorqueSwerveModule2022:
+        self.drive_reveresed_auto = reverse
         return self
     
     def reverse_turn(self, reverse: bool = True) -> TorqueSwerveModule2022:

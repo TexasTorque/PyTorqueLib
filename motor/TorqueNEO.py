@@ -1,3 +1,4 @@
+from __future__ import annotations
 import rev
 
 class TorqueNEO:
@@ -7,6 +8,7 @@ class TorqueNEO:
         self.controller: rev.SparkPIDController = self.motor.getPIDController()
         self.followers: list[rev.CANSparkMax] = []
         self.motor.setInverted(False)
+        self.disabled = False
     
     def add_follower(self, id: int, invert: bool) -> None:
         follower = rev.CANSparkMax(id, rev.CANSparkLowLevel.MotorType.kBrushless)
@@ -28,7 +30,8 @@ class TorqueNEO:
         return self.controller
     
     def set_volts(self, volts: float) -> None:
-        self.motor.setVoltage(volts)
+        if not self.disabled:
+            self.motor.setVoltage(volts)
     
     def set_voltage_compensation(self, volts: float) -> None:
         self.motor.enableVoltageCompensation(volts)
@@ -72,3 +75,7 @@ class TorqueNEO:
     
     def set_smart_position(self, pos: float) -> None:
         self.controller.setReference(pos, rev.CANSparkMax.ControlType.kSmartMotion)
+    
+    def disable(self, disabled=True) -> TorqueNEO:
+        self.disabled = disabled
+        return self
