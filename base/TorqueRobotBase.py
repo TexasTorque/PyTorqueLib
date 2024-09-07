@@ -61,12 +61,16 @@ class TorqueRobotBase(wpilib.TimedRobot):
     def autonomousInit(self) -> None:
         if self.auto_manager != None:
             self.auto_manager.choose_current_sequence()
+        if self.input != None:
+            self.input.initialize(TorqueMode.AUTO)
         for subsystem in self.subsystems:
             subsystem.initialize(TorqueMode.AUTO)
     
     def autonomousPeriodic(self) -> None:
         if self.auto_manager != None:
             self.auto_manager.run_current_sequence()
+        if self.input != None:
+            self.input.update(TorqueMode.AUTO)
         for subsystems in self.subsystems:
             subsystems.update(TorqueMode.AUTO)
         for subsystem in self.subsystems:
