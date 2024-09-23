@@ -30,7 +30,7 @@ class TorqueFollowPath(TorqueCommand):
         PPLibTelemetry.setCurrentPath(self.path)
         
         startingPose = self.trajectory.getInitialDifferentialPose()
-        systems.drivebase.set_pose(startingPose)
+        systems.drivebase.pose = startingPose
         self.timer.restart()
         
     def continuous(self) -> None:
