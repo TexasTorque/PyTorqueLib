@@ -20,6 +20,7 @@ class TorqueFollowPath(TorqueCommand):
         self.controller = PPHolonomicDriveController(PIDConstants(10, 0, 0), PIDConstants(math.pi, 0, 0), 4.6, systems.drivebase.get_radius())
     
     def init(self) -> None:
+        print("init follow path")
         self.path = PathPlannerPath.fromPathFile(self.path_name)
 
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
