@@ -3,79 +3,66 @@ import rev
 
 class TorqueNEO:
     def __init__(self, id: int) -> None:
-        self.motor = rev.CANSparkMax(id, rev.CANSparkLowLevel.MotorType.kBrushless)
-        self.encoder = self.motor.getEncoder()
-        self.controller: rev.SparkPIDController = self.motor.getPIDController()
-        self.followers: list[rev.CANSparkMax] = []
-        self.motor.setInverted(False)
-        self.disabled = False
+        self.motor = rev.SparkMax(id, rev.SparkLowLevel.MotorType.kBrushless)
+        self.config = rev.SparkMaxConfig()
     
-    def add_follower(self, id: int, invert: bool) -> None:
-        follower = rev.CANSparkMax(id, rev.CANSparkLowLevel.MotorType.kBrushless)
-        self.followers.append(follower)
-        follower.follow(self.motor, invert)
-
-    def burn_flash(self) -> None:
-        self.motor.burnFlash()
+    def invert(self, invert: bool) -> TorqueNEO:
+        self.config.inverted(invert)
+        return self
     
-    def set_break_mode(self, break_: bool) -> None:
-        self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake if break_ else rev.CANSparkMax.IdleMode.kCoast)
-        for follower in self.followers:
-            follower.setIdleMode(rev.CANSparkMax.IdleMode.kBrake if break_ else rev.CANSparkMax.IdleMode.kCoast)
+    def idle_mode(self, idle_mode: rev.SparkMaxConfig.IdleMode) -> TorqueNEO:
+        self.config.setIdleMode(idle_mode)
+        return self
+    
+    def pid(self, p: float, i: float, d: float) -> TorqueNEO:
+        self.config.closedLoop.pid(p, i, d)
+        return self
+    
+    def pidf(self, p: float, i: float, d: float, f: float) -> TorqueNEO:
+        self.config.closedLoop.pidf(p, i, d, f)
+        return self
+    
+    def voltage_compensation(self, voltage: float) -> TorqueNEO:
+        self.config.voltageCompensation(voltage)
+        return self
+    
+    def disable_voltage_compensation(self) -> TorqueNEO:
+        self.config.disableVoltageCompensation()
+        return self
+    
+    def current_limit(self, limit: int) -> TorqueNEO:
+        self.config.smartCurrentLimit(limit)
+        return self
+    
+    def conversion_factors(self, pos_factor: float, velo_factor: float) -> TorqueNEO:
+        self.config.encoder.positionConversionFactor(pos_factor)
+        self.config.encoder.velocityConversionFactor(velo_factor)
+        return self
+    
+    def apply(self) -> TorqueNEO:
+        self.motor.configure(self.config, rev.SparkBase.ResetMode.kResetSafeParameters, rev.SparkBase.PersistMode.kPersistParameters)
+        return self
     
     def set_percent(self, percent: float) -> None:
         self.motor.set(percent)
-    
-    def get_controller(self) -> rev.SparkPIDController:
-        return self.controller
+
+    def get_percent(self) -> float:
+        return self.motor.get()
     
     def set_volts(self, volts: float) -> None:
-        if not self.disabled:
-            self.motor.setVoltage(volts)
-    
-    def set_voltage_compensation(self, volts: float) -> None:
-        self.motor.enableVoltageCompensation(volts)
-    
-    def disable_voltage_compensation(self) -> None:
-        self.motor.disableVoltageCompensation()
-    
-    def set_current_limit(self, amps: int) -> None:
-        self.motor.setSmartCurrentLimit(amps)
+        self.motor.setVoltage(volts)
 
-    def set_inverted(self, invert: bool) -> None:
-        self.motor.setInverted(invert)
+    def get_volts(self) -> float:
+        return self.motor.getAppliedOutput()
     
-    def configure_controller(self, p: float, i: float, d: float, ff: float = 0) -> None:
-        self.controller.setP(p)
-        self.controller.setI(i)
-        self.controller.setD(d)
-        self.controller.setFF(ff)
-
-    def set_reference(self, goal: float, control: rev.CANSparkMax.ControlType) -> None:
-        self.controller.setReference(goal, control)
-
-    def set_conversion_factor(self, posFactor: float, veloFactor: float) -> None:
-        self.encoder.setPositionConversionFactor(posFactor)
-        self.encoder.setVelocityConversionFactor(veloFactor)
-
-    def set_position(self, pos: float) -> None:
-        self.controller.setReference(pos, rev.CANSparkMax.ControlType.kPosition)
+    def get_bus_voltage(self) -> float:
+        return self.motor.getBusVoltage()
+    
+    def get_output_current(self) -> float:
+        return self.motor.getOutputCurrent()
     
     def get_position(self) -> float:
-        return self.encoder.getPosition()
-    
-    def set_velocity(self, velocity: float) -> None:
-        self.controller.setReference(velocity, rev.CANSparkMax.ControlType.kVelocity)
-    
+        return self.motor.getEncoder().getPosition()
+
     def get_velocity(self) -> float:
-        return self.encoder.getVelocity()
-    
-    def set_smart_velocity(self, velocity: float) -> None:
-        self.controller.setReference(velocity, rev.CANSparkMax.ControlType.kSmartVelocity)
-    
-    def set_smart_position(self, pos: float) -> None:
-        self.controller.setReference(pos, rev.CANSparkMax.ControlType.kSmartMotion)
-    
-    def disable(self, disabled=True) -> TorqueNEO:
-        self.disabled = disabled
-        return self
+        return self.motor.getEncoder().getVelocity()

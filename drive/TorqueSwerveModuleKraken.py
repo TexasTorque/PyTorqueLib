@@ -11,6 +11,7 @@ from phoenix6.configs import TalonFXConfiguration
 from phoenix6.signals import InvertedValue
 from phoenix6.signals import NeutralModeValue
 from phoenix6.controls import DutyCycleOut
+import rev
 
 from ports import SwervePorts
 
@@ -26,8 +27,6 @@ class TorqueSwerveModuleKraken:
         self.drive_config.feedback.rotor_to_sensor_ratio = 1
         self.drive_config.current_limits.supply_current_limit_enable = True
         self.drive_config.current_limits.supply_current_limit = 35
-        self.drive_config.current_limits.supply_current_threshold = 60
-        self.drive_config.current_limits.supply_time_threshold = 0.1
         self.drive_config.current_limits.stator_current_limit_enable = True
         self.drive_config.current_limits.stator_current_limit = 50
         self.drive_config.open_loop_ramps.duty_cycle_open_loop_ramp_period = 0
@@ -41,12 +40,13 @@ class TorqueSwerveModuleKraken:
 
         self.drive_duty_cycle = DutyCycleOut(0)
 
-        self.turn = TorqueNEO(ports.turnID)
-        self.turn.set_current_limit(25)
-        self.turn.set_voltage_compensation(12.6)
-        self.turn.set_break_mode(True)
-        self.turn.set_conversion_factor(77.97432966, 1)
-        self.turn.burn_flash()
+        self.turn = (TorqueNEO(ports.turnID)
+                     .current_limit(25)
+                     .voltage_compensation(12.6)
+                     .idle_mode(rev.SparkMaxConfig.IdleMode.kBrake)
+                     .conversion_factors(77.97432966, 1)
+                     .apply()
+        )
 
         self.encoder: CANcoder = CANcoder(ports.encoderID)
 
@@ -61,17 +61,17 @@ class TorqueSwerveModuleKraken:
         self.last_sampled_time = -1
     
     def set_desired_state(self, state: SwerveModuleState, use_smart_drive: bool = False) -> None:
-        optimized = SwerveModuleState.optimize(state, self.get_rotation())
+        state.optimize(self.get_rotation())
         
         if use_smart_drive:
-            drivePIDOutput = self.drivePID.calculate(self.drive.get_velocity().value_as_double, optimized.speed)
-            driveFFOutput = self.driveFF.calculate(optimized.speed)
+            drivePIDOutput = self.drivePID.calculate(self.drive.get_velocity().value_as_double, state.speed)
+            driveFFOutput = self.driveFF.calculate(state.speed)
 
             self.drive_duty_cycle.output = drivePIDOutput + driveFFOutput
         else:
-            self.drive_duty_cycle.output = optimized.speed / 4.6
+            self.drive_duty_cycle.output = state.speed / 4.6
 
-        turnPIDOutput = -self.turnPID.calculate(self.get_rotation().radians(), optimized.angle.radians())
+        turnPIDOutput = -self.turnPID.calculate(self.get_rotation().radians(), state.angle.radians())
         self.turn.set_percent(turnPIDOutput)
 
         self.drive.set_control(self.drive_duty_cycle)
@@ -82,8 +82,8 @@ class TorqueSwerveModuleKraken:
                 self.last_sampled_time = time
             delta_time = time - self.last_sampled_time
             self.last_sampled_time = time
-            self.aggregate_position.distance += optimized.speed * delta_time
-            self.aggregate_position.angle = optimized.angle
+            self.aggregate_position.distance += state.speed * delta_time
+            self.aggregate_position.angle = state.angle
     
     def get_state(self) -> SwerveModuleState:
         return SwerveModuleState(self.drive.get_velocity().value_as_double, self.get_rotation())

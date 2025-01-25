@@ -26,11 +26,11 @@ class TorqueFollowPath(TorqueCommand):
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
             self.path = self.path.flipPath()
         
-        self.trajectory = self.path.getTrajectory(ChassisSpeeds(), Rotation2d.fromDegrees(systems.drivebase.get_gyro_measurement()))
+        self.trajectory = self.path.generateTrajectory(ChassisSpeeds(), Rotation2d.fromDegrees(systems.drivebase.get_gyro_measurement()), config)
         
         PPLibTelemetry.setCurrentPath(self.path)
         
-        startingPose = self.trajectory.getInitialDifferentialPose()
+        startingPose = self.trajectory.getInitialPose()
         systems.drivebase.pose = startingPose
         self.timer.restart()
         
@@ -43,7 +43,7 @@ class TorqueFollowPath(TorqueCommand):
         systems.drivebase.set_speeds(speeds.vx, speeds.vy, speeds.omega)
         
         PPLibTelemetry.setCurrentPose(systems.drivebase.get_pose())
-        PPLibTelemetry.setTargetPose(desired.getDifferentialPose())
+        PPLibTelemetry.setTargetPose(desired.pose)
     
     def end_condition(self) -> bool:
         return self.timer.hasElapsed(self.trajectory.getTotalTimeSeconds())

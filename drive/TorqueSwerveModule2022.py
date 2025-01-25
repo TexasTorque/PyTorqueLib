@@ -8,6 +8,7 @@ from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Rotation2d
 from lib.util.TorqueMath import coterminal
 from ports import SwervePorts
+import rev
 
 # Works on Fuse with custom swerve modules
 
@@ -45,19 +46,21 @@ class TorqueSwerveModule2022:
         self.name = name
         self.config = config
 
-        self.drive = TorqueNEO(ports.driveID)
-        self.drive.set_current_limit(config.drive_max_current)
-        self.drive.set_voltage_compensation(config.voltage_compensation)
-        self.drive.set_break_mode(True)
-        self.drive.set_conversion_factor(config.drive_pose_factor, config.drive_velocity_factor)
-        self.drive.burn_flash()
+        self.drive = (TorqueNEO(ports.driveID)
+                      .current_limit(config.drive_max_current)
+                      .voltage_compensation(config.voltage_compensation)
+                      .idle_mode(rev.SparkBaseConfig.IdleMode.kBrake)
+                      .conversion_factors(config.drive_pose_factor, config.drive_velocity_factor)
+                      .apply()
+        )
 
-        self.turn = TorqueNEO(ports.turnID)
-        self.turn.set_current_limit(config.turn_max_current)
-        self.turn.set_voltage_compensation(config.voltage_compensation)
-        self.turn.set_break_mode(True)
-        self.turn.set_conversion_factor(config.turn_gear_ratio * 2 * math.pi, 1)
-        self.turn.burn_flash()
+        self.turn = (TorqueNEO(ports.turnID)
+                     .current_limit(config.turn_max_current)
+                     .voltage_compensation(config.voltage_compensation)
+                     .idle_mode(rev.SparkMaxConfig.IdleMode.kBrake)
+                     .conversion_factors(config.turn_gear_ratio * 2 * math.pi, 1).
+                     apply()
+        )
 
         self.encoder = CANcoder(ports.encoderID)
 
@@ -77,11 +80,11 @@ class TorqueSwerveModule2022:
         self.last_sampled_time = -1
     
     def set_desired_state(self, state: SwerveModuleState, use_smart_drive: bool = False) -> None:
-        optimized = SwerveModuleState.optimize(state, self.get_rotation())
+        state.optimize(self.get_rotation())
         
         if use_smart_drive:
-            drivePIDOutput = self.drivePID.calculate(self.drive.get_velocity(), optimized.speed)
-            driveFFOutput = self.driveFF.calculate(optimized.speed)
+            drivePIDOutput = self.drivePID.calculate(self.drive.get_velocity(), state.speed)
+            driveFFOutput = self.driveFF.calculate(state.speed)
 
             if self.drive_reveresed_auto:
                 self.drive.set_percent(-(drivePIDOutput + driveFFOutput))
@@ -89,11 +92,11 @@ class TorqueSwerveModule2022:
                 self.drive.set_percent(drivePIDOutput + driveFFOutput)
         else:
             if self.drive_reversed:
-                self.drive.set_percent(-optimized.speed / self.config.max_velocity)
+                self.drive.set_percent(-state.speed / self.config.max_velocity)
             else:
-                self.drive.set_percent(optimized.speed / self.config.max_velocity)
+                self.drive.set_percent(state.speed / self.config.max_velocity)
 
-        turnPIDOutput = -self.turnPID.calculate(self.get_rotation().radians(), optimized.angle.radians())
+        turnPIDOutput = -self.turnPID.calculate(self.get_rotation().radians(), state.angle.radians())
 
         if self.turn_reversed:
             turnPIDOutput = -turnPIDOutput
@@ -107,8 +110,8 @@ class TorqueSwerveModule2022:
                 self.last_sampled_time = time
             delta_time = time - self.last_sampled_time
             self.last_sampled_time = time
-            self.aggregate_position.distance += optimized.speed * delta_time
-            self.aggregate_position.angle = optimized.angle
+            self.aggregate_position.distance += state.speed * delta_time
+            self.aggregate_position.angle = state.angle
     
     def get_state(self) -> SwerveModuleState:
         return SwerveModuleState(self.drive.get_velocity(), self.get_rotation())
